@@ -34,8 +34,6 @@ export async function metricsRoutes(app: FastifyInstance) {
       }
     }
 
-    console.log(totalMealsWithinDiet)
-
     return reply.send({
       totalMeals,
       mealsWithinTheDiet: totalMealsWithinDiet.length,

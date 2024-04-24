@@ -3,7 +3,6 @@ import { authenticate } from '../middlewares/auth'
 import { z } from 'zod'
 import { knex } from '../database'
 import { randomUUID } from 'node:crypto'
-import { createDeflate } from 'node:zlib'
 
 export async function mealsRoutes(app: FastifyInstance) {
   app.addHook('preHandler', authenticate)

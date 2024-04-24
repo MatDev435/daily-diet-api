@@ -3,6 +3,7 @@ import { authenticate } from '../middlewares/auth'
 import { z } from 'zod'
 import { knex } from '../database'
 import { randomUUID } from 'node:crypto'
+import { createDeflate } from 'node:zlib'
 
 export async function mealsRoutes(app: FastifyInstance) {
   app.post(
@@ -12,13 +13,14 @@ export async function mealsRoutes(app: FastifyInstance) {
     },
     async (request, reply) => {
       const createMealBodySchema = z.object({
-        name: z.string(),
+        title: z.string(),
         description: z.string().nullable(),
-        createdAt: z.string().nullable(),
+        date: z.string(),
+        time: z.string(),
         partOfDiet: z.boolean(),
       })
 
-      const { name, description, createdAt, partOfDiet } =
+      const { title, description, date, time, partOfDiet } =
         createMealBodySchema.parse(request.body)
 
       const userId = request.user.id
@@ -26,9 +28,10 @@ export async function mealsRoutes(app: FastifyInstance) {
       await knex('meals').insert({
         id: randomUUID(),
         user_id: userId,
-        name,
-        description: description ?? null,
-        created_at: createdAt ?? null,
+        title,
+        description,
+        date,
+        time,
         part_of_diet: partOfDiet,
       })
 
@@ -78,6 +81,49 @@ export async function mealsRoutes(app: FastifyInstance) {
       }
 
       return reply.send({ meal })
+    },
+  )
+
+  app.put(
+    '/:id',
+    {
+      preHandler: [authenticate],
+    },
+    async (request, reply) => {
+      const paramsSchema = z.object({
+        id: z.string(),
+      })
+
+      const updateMealBodySchema = z.object({
+        title: z.string(),
+        description: z.string().nullable(),
+        date: z.string(),
+        time: z.string(),
+        partOfDiet: z.boolean(),
+      })
+
+      const { id } = paramsSchema.parse(request.params)
+
+      const userId = request.user.id
+
+      const { title, description, date, time, partOfDiet } =
+        updateMealBodySchema.parse(request.body)
+
+      const meal = await knex('meals').where({ id, user_id: userId }).first()
+
+      if (!meal) {
+        return reply.status(404).send({ message: 'Meal not found.' })
+      }
+
+      await knex('meals').select().where({ id, user_id: userId }).update({
+        title,
+        description,
+        date,
+        time,
+        part_of_diet: partOfDiet,
+      })
+
+      return reply.status(204).send()
     },
   )
 }

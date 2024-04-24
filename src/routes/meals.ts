@@ -126,4 +126,37 @@ export async function mealsRoutes(app: FastifyInstance) {
       return reply.status(204).send()
     },
   )
+
+  app.delete(
+    '/:id',
+    {
+      preHandler: [authenticate],
+    },
+    async (request, reply) => {
+      const paramsSchema = z.object({
+        id: z.string().uuid(),
+      })
+
+      const { id } = paramsSchema.parse(request.params)
+
+      const userId = request.user.id
+
+      const meal = await knex('meals')
+        .select()
+        .where({ id, user_id: userId })
+        .first()
+
+      if (!meal) {
+        return reply.status(404).send({ message: 'Meal not found.' })
+      }
+
+      await knex('meals')
+        .select()
+        .where({ id, user_id: userId })
+        .first()
+        .delete()
+
+      return reply.status(204).send()
+    },
+  )
 }

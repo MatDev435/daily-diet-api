@@ -18,6 +18,7 @@ declare module 'knex/types/tables' {
       date: string | null
       time: string
       part_of_diet: boolean
+      created_at: string
     }
   }
 }

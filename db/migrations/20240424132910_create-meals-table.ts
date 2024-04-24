@@ -10,6 +10,7 @@ export async function up(knex: Knex): Promise<void> {
     table.text('date').notNullable()
     table.text('time').notNullable()
     table.boolean('part_of_diet').notNullable()
+    table.timestamp('created_at').defaultTo(knex.fn.now()).notNullable()
   })
 }
 

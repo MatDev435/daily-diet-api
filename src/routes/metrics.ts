@@ -35,10 +35,12 @@ export async function metricsRoutes(app: FastifyInstance) {
     }
 
     return reply.send({
-      totalMeals,
-      mealsWithinTheDiet: totalMealsWithinDiet.length,
-      mealsOutsideTheDiet: totalMealsOutsideDiet.length,
-      bestStreak,
+      metrics: {
+        totalMeals,
+        mealsWithinTheDiet: totalMealsWithinDiet.length,
+        mealsOutsideTheDiet: totalMealsOutsideDiet.length,
+        bestStreak,
+      },
     })
   })
 }

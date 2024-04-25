@@ -9,10 +9,12 @@ import { metricsRoutes } from './routes/metrics'
 export const app = fastify()
 
 app.register(cookies)
+
 app.register(jwt, {
   secret: env.JWT_SECRET,
   cookie: {
     cookieName: 'auth',
+    signed: false,
   },
 })
 
